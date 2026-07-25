@@ -11,6 +11,143 @@ const PRODUCT_STORAGE_KEY = 'nate-store-products';
 const ORDER_STORAGE_KEY = 'nate-store-orders';
 const CART_STORAGE_KEY = 'nate-store-cart';
 const LINE_URL = 'https://line.me/R/ti/p/@nate.store12';
+const copy = {
+  th: {
+    searchPlaceholder: 'คุณกำลังค้นหาอะไร?',
+    accountTitle: 'เข้าสู่ระบบ/สมัครสมาชิก',
+    modalCopy: 'ปลดล็อกศักยภาพสูงสุดของคุณ! ช้อปอุปกรณ์กีฬา พร้อมดีลสุดคุ้ม',
+    name: 'ชื่อ',
+    yourName: 'ชื่อของคุณ',
+    email: 'อีเมล',
+    password: 'รหัสผ่าน',
+    registerPassword: 'เบอร์โทรศัพท์ / รหัสผ่าน',
+    passwordPlaceholder: 'อย่างน้อย 6 ตัวอักษร',
+    login: 'เข้าสู่ระบบ',
+    register: 'สมัครสมาชิก',
+    switchRegister: 'ยังไม่มีบัญชี? สมัครสมาชิก',
+    switchLogin: 'มีบัญชีแล้ว? เข้าสู่ระบบ',
+    heroEyebrow: 'nate.store12 / sports select shop',
+    heroTitle: 'ของกีฬา Ari และเซ็ตคุ้ม ๆ จากร้าน nate.store12',
+    heroCopy: 'รวมสินค้า Ari, กระเป๋า, gymsack, เสื้อบอล, ถุงเท้า, เชือกรองเท้า และเซ็ตจับคู่ พร้อมโปรรวมส่ง สกรีนฟรี และถุงฟรีหลายรายการ',
+    orderLine: 'สั่งซื้อผ่าน LINE',
+    viewProducts: 'ดูสินค้า',
+    popularSearches: 'ค้นหายอดนิยม',
+    shopPrefix: 'Shop',
+    catalog: 'nate.store12 catalog',
+    recommended: 'สินค้าแนะนำ',
+    searchProducts: 'ค้นหาสินค้า',
+    contactInfo: 'ข้อมูลติดต่อ',
+    customerName: 'ชื่อผู้สั่ง',
+    customerContact: 'เบอร์โทร / LINE ID',
+    contactNote: 'ร้านจะใช้ข้อมูลนี้ติดต่อกลับเพื่อยืนยันสี ไซซ์ โปร และการชำระเงินผ่าน LINE @nate.store12',
+    cart: 'ตะกร้าสินค้า',
+    emptyCart: 'ยังไม่มีสินค้าในตะกร้า',
+    color: 'สี',
+    size: 'ไซซ์',
+    subtotal: 'สินค้า',
+    shipping: 'จัดส่ง',
+    total: 'รวม',
+    orderPayment: 'สั่งซื้อและชำระเงิน',
+    address: 'ที่อยู่จัดส่ง',
+    confirmOrder: 'ยืนยันคำสั่งซื้อ',
+    sendCartLine: 'ส่งตะกร้าผ่าน LINE',
+    backToShop: 'กลับไปหน้าร้าน',
+    perks: 'โปรของรายการนี้',
+    stockLeft: 'มีสินค้าไซซ์',
+    leftUnit: 'เหลือ',
+    pieces: 'ชิ้น',
+    quantity: 'จำนวน',
+    addToCart: 'เพิ่มลงตะกร้า',
+    buyNow: 'ซื้อเลย',
+    orderSteps: ['กดเลือกสินค้า ดูสี ไซซ์ และจำนวน', 'เพิ่มลงตะกร้าหรือกดซื้อเลย', 'กรอกชื่อ เบอร์/LINE ID แล้วให้ร้านยืนยันยอด'],
+    dashboardSales: 'ยอดขาย',
+    dashboardOrders: 'ออเดอร์',
+    dashboardLowStock: 'สินค้าใกล้หมด',
+    manageProducts: 'จัดการสินค้าและสต๊อก',
+    manageOrders: 'จัดการออเดอร์',
+    noOrders: 'ยังไม่มีออเดอร์'
+  },
+  en: {
+    searchPlaceholder: 'What are you looking for?',
+    accountTitle: 'Login / Register',
+    modalCopy: 'Unlock member benefits, faster checkout, and exclusive sports deals.',
+    name: 'Name',
+    yourName: 'Your name',
+    email: 'Email',
+    password: 'Password',
+    registerPassword: 'Phone / Password',
+    passwordPlaceholder: 'At least 6 characters',
+    login: 'Login',
+    register: 'Register',
+    switchRegister: 'No account? Register',
+    switchLogin: 'Already have an account? Login',
+    heroEyebrow: 'nate.store12 / sports select shop',
+    heroTitle: 'Ari gear and value sets from nate.store12',
+    heroCopy: 'Shop Ari items, bags, gymsacks, football shirts, socks, laces, and bundle sets with shipping, screen-print, and bag promos.',
+    orderLine: 'Order via LINE',
+    viewProducts: 'View products',
+    popularSearches: 'Popular searches',
+    shopPrefix: 'Shop',
+    catalog: 'nate.store12 catalog',
+    recommended: 'Recommended products',
+    searchProducts: 'Search products',
+    contactInfo: 'Contact details',
+    customerName: 'Customer name',
+    customerContact: 'Phone / LINE ID',
+    contactNote: 'The shop will use this information to confirm color, size, promo, and payment via LINE @nate.store12.',
+    cart: 'Shopping cart',
+    emptyCart: 'Your cart is empty',
+    color: 'Color',
+    size: 'Size',
+    subtotal: 'Subtotal',
+    shipping: 'Shipping',
+    total: 'Total',
+    orderPayment: 'Order and payment',
+    address: 'Shipping address',
+    confirmOrder: 'Confirm order',
+    sendCartLine: 'Send cart via LINE',
+    backToShop: 'Back to shop',
+    perks: 'Item perks',
+    stockLeft: 'Size',
+    leftUnit: 'has',
+    pieces: 'pcs left',
+    quantity: 'Quantity',
+    addToCart: 'Add to cart',
+    buyNow: 'Buy now',
+    orderSteps: ['Choose product, color, size, and quantity', 'Add to cart or buy now', 'Enter name and phone/LINE ID for order confirmation'],
+    dashboardSales: 'Sales',
+    dashboardOrders: 'Orders',
+    dashboardLowStock: 'Low stock',
+    manageProducts: 'Products and stock',
+    manageOrders: 'Orders',
+    noOrders: 'No orders yet'
+  }
+};
+const categoryLabelsEn = {
+  All: 'All',
+  'สินค้าขายดี': 'Best sellers',
+  'สินค้าใหม่': 'New arrivals',
+  'Set จับคู่': 'Bundle sets',
+  'Set ตามงบ': 'Budget sets',
+  'ถุงเท้า Ari': 'Ari socks',
+  'เชือกรองเท้า': 'Shoe laces',
+  'กระเป๋า': 'Bags',
+  'เสื้อ Ari': 'Ari shirts',
+  'กางเกง Ari': 'Ari shorts',
+  'สินค้าอื่นๆ': 'Others'
+};
+const priceLabelsEn = {
+  All: 'All',
+  Sale: 'Sale',
+  'Under 500': 'Under 500',
+  '500-1000': '500-1000',
+  '1000+': '1000+'
+};
+const paymentLabelsEn = {
+  qr: 'PromptPay QR',
+  bank: 'Bank transfer',
+  cod: 'Cash on delivery'
+};
 
 function loadProducts() {
   const storedProducts = loadState(PRODUCT_STORAGE_KEY, seedProducts);
@@ -56,6 +193,7 @@ export default function App() {
   const [detailQuantity, setDetailQuantity] = useState(1);
   const [activeProduct, setActiveProduct] = useState(seedProducts[0].id);
   const [notice, setNotice] = useState('');
+  const [language, setLanguage] = useState(() => loadState('nate-store-language', 'th'));
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', phone: '', password: '' });
@@ -66,6 +204,7 @@ export default function App() {
   useEffect(() => saveState('nate-store-accounts', accounts), [accounts]);
   useEffect(() => saveState('nate-store-member', member), [member]);
   useEffect(() => saveState(CART_STORAGE_KEY, cart), [cart]);
+  useEffect(() => saveState('nate-store-language', language), [language]);
 
   const filteredProducts = useMemo(() => {
     return filterProducts({ products, category, brand: 'All', query, priceRange });
@@ -75,6 +214,10 @@ export default function App() {
   const activeSizes = Object.keys(active.stockBySize);
   const selectedStock = active.stockBySize[selectedSize] || 0;
   const totals = calculateCartTotals(cart, products);
+  const t = copy[language];
+  const labelCategory = (value) => (language === 'en' ? categoryLabelsEn[value] || value : value);
+  const labelPrice = (value) => (language === 'en' ? priceLabelsEn[value] || value : value);
+  const labelPayment = (key, value) => (language === 'en' ? paymentLabelsEn[key] || value : value);
   const revenue = orders.reduce((sum, order) => sum + order.totals.total, 0);
   const lowStock = products.flatMap((product) =>
     Object.entries(product.stockBySize)
@@ -228,7 +371,7 @@ export default function App() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={() => setView('shop')}
-            placeholder="คุณกำลังค้นหาอะไร?"
+            placeholder={t.searchPlaceholder}
           />
         </label>
         <div className="header-icons">
@@ -239,7 +382,7 @@ export default function App() {
               <LogOut size={18} />
             </button>
           ) : (
-            <button className="icon-button" onClick={() => openAuth('login')} title="เข้าสู่ระบบ/สมัครสมาชิก">
+            <button className="icon-button" onClick={() => openAuth('login')} title={t.accountTitle}>
               <UserRound size={24} />
             </button>
           )}
@@ -248,7 +391,9 @@ export default function App() {
             <ShoppingBag size={24} />
             {totals.itemCount > 0 && <b>{totals.itemCount}</b>}
           </button>
-          <button className="language-pill" title="English"><strong>EN</strong></button>
+          <button className="language-pill" title={language === 'th' ? 'Switch to English' : 'เปลี่ยนเป็นภาษาไทย'} onClick={() => setLanguage(language === 'th' ? 'en' : 'th')}>
+            <strong>{language === 'th' ? 'EN' : 'TH'}</strong>
+          </button>
         </div>
       </header>
 
@@ -263,25 +408,25 @@ export default function App() {
             </div>
             <form className="auth-card modal-card" onSubmit={submitAuth}>
               <button className="close-modal" type="button" onClick={() => setAuthOpen(false)} aria-label="ปิด"><X size={22} /></button>
-              <h2>เข้าสู่ระบบ/สมัครสมาชิก</h2>
-              <p>ปลดล็อกศักยภาพสูงสุดของคุณ! ช้อปอุปกรณ์กีฬา พร้อมดีลสุดคุ้ม</p>
+              <h2>{t.accountTitle}</h2>
+              <p>{t.modalCopy}</p>
               {authMode === 'register' && (
                 <label>
-                  ชื่อ
-                  <input value={authForm.name} onChange={(event) => setAuthForm({ ...authForm, name: event.target.value })} placeholder="ชื่อของคุณ" />
+                  {t.name}
+                  <input value={authForm.name} onChange={(event) => setAuthForm({ ...authForm, name: event.target.value })} placeholder={t.yourName} />
                 </label>
               )}
               <label>
-                อีเมล
-                <input type="email" value={authForm.email} onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })} placeholder="อีเมล" />
+                {t.email}
+                <input type="email" value={authForm.email} onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })} placeholder={t.email} />
               </label>
               <label>
-                {authMode === 'register' ? 'เบอร์โทรศัพท์ / รหัสผ่าน' : 'รหัสผ่าน'}
-                <input type="password" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} placeholder={authMode === 'register' ? 'อย่างน้อย 6 ตัวอักษร' : 'รหัสผ่าน'} />
+                {authMode === 'register' ? t.registerPassword : t.password}
+                <input type="password" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} placeholder={authMode === 'register' ? t.passwordPlaceholder : t.password} />
               </label>
-              <button disabled={!authForm.email.trim() || !authForm.password.trim()}>{authMode === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'}</button>
+              <button disabled={!authForm.email.trim() || !authForm.password.trim()}>{authMode === 'login' ? t.login : t.register}</button>
               <button className="secondary" type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}>
-                {authMode === 'login' ? 'ยังไม่มีบัญชี? สมัครสมาชิก' : 'มีบัญชีแล้ว? เข้าสู่ระบบ'}
+                {authMode === 'login' ? t.switchRegister : t.switchLogin}
               </button>
             </form>
           </div>
@@ -292,16 +437,16 @@ export default function App() {
         <>
           <section className="hero">
             <div>
-              <p>nate.store12 / sports select shop</p>
-              <h1>ของกีฬา Ari และเซ็ตคุ้ม ๆ จากร้าน nate.store12</h1>
-              <span className="hero-copy">รวมสินค้า Ari, กระเป๋า, gymsack, เสื้อบอล, ถุงเท้า, เชือกรองเท้า และเซ็ตจับคู่ พร้อมโปรรวมส่ง สกรีนฟรี และถุงฟรีหลายรายการ</span>
+              <p>{t.heroEyebrow}</p>
+              <h1>{t.heroTitle}</h1>
+              <span className="hero-copy">{t.heroCopy}</span>
               <div className="hero-actions">
-                <button onClick={() => window.open(LINE_URL, '_blank')}>สั่งซื้อผ่าน LINE</button>
-                <button className="secondary" onClick={() => document.getElementById('new-arrivals')?.scrollIntoView({ behavior: 'smooth' })}>ดูสินค้า</button>
+                <button onClick={() => window.open(LINE_URL, '_blank')}>{t.orderLine}</button>
+                <button className="secondary" onClick={() => document.getElementById('new-arrivals')?.scrollIntoView({ behavior: 'smooth' })}>{t.viewProducts}</button>
                 <button className="secondary" onClick={() => setView('checkout')}><ShoppingBag size={18} /> Cart ({totals.itemCount})</button>
               </div>
               <div className="popular-search">
-                <span>ค้นหายอดนิยม</span>
+                <span>{t.popularSearches}</span>
                 {popularSearches.map((term) => (
                   <button key={term} onClick={() => {
                     setQuery(term);
@@ -323,7 +468,7 @@ export default function App() {
                   document.getElementById('new-arrivals')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                <span>Shop {entry}</span>
+                <span>{t.shopPrefix} {labelCategory(entry)}</span>
               </button>
             ))}
           </section>
@@ -331,19 +476,19 @@ export default function App() {
           <section className="shop-section" id="new-arrivals">
             <div className="section-heading">
               <div>
-                <p>nate.store12 catalog</p>
-                <h2>สินค้าแนะนำ</h2>
+                <p>{t.catalog}</p>
+                <h2>{t.recommended}</h2>
               </div>
-              <label className="search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ค้นหาสินค้า" /></label>
+              <label className="search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.searchProducts} /></label>
             </div>
             <div className="filter-list">
               {['All', ...categories].map((entry) => (
-                <button key={entry} className={category === entry ? 'selected' : ''} onClick={() => setCategory(entry)}>{entry}</button>
+                <button key={entry} className={category === entry ? 'selected' : ''} onClick={() => setCategory(entry)}>{labelCategory(entry)}</button>
               ))}
             </div>
             <div className="filter-list compact-filter">
               {priceRanges.map((entry) => (
-                <button key={entry} className={priceRange === entry ? 'selected' : ''} onClick={() => setPriceRange(entry)}>{entry}</button>
+                <button key={entry} className={priceRange === entry ? 'selected' : ''} onClick={() => setPriceRange(entry)}>{labelPrice(entry)}</button>
               ))}
             </div>
 
@@ -375,9 +520,7 @@ export default function App() {
             </section>
 
             <section className="order-guide">
-              <div><strong>1</strong><span>กดเลือกสินค้า ดูสี ไซซ์ และจำนวน</span></div>
-              <div><strong>2</strong><span>เพิ่มลงตะกร้าหรือกดซื้อเลย</span></div>
-              <div><strong>3</strong><span>กรอกชื่อ เบอร์/LINE ID แล้วให้ร้านยืนยันยอด</span></div>
+              {t.orderSteps.map((step, index) => <div key={step}><strong>{index + 1}</strong><span>{step}</span></div>)}
             </section>
           </section>
         </>
@@ -396,7 +539,7 @@ export default function App() {
             </div>
           </div>
           <div className="detail-info">
-            <button className="link-button" onClick={() => setView('shop')}>กลับไปหน้าร้าน</button>
+            <button className="link-button" onClick={() => setView('shop')}>{t.backToShop}</button>
             <span className="category-pill">{active.category}</span>
             <span className="category-pill">{active.brand}</span>
             <h1>{active.name}</h1>
@@ -405,14 +548,14 @@ export default function App() {
             <p>{active.description}</p>
             {active.perks && (
               <div className="option-block">
-                <strong>โปรของรายการนี้</strong>
+                <strong>{t.perks}</strong>
                 <div className="surface-list">
                   {active.perks.map((perk) => <span key={perk}>{perk}</span>)}
                 </div>
               </div>
             )}
             <div className="option-block">
-              <strong>สี</strong>
+              <strong>{t.color}</strong>
               <div className="swatches">
                 {active.colors.map((color) => (
                   <button key={color} className={selectedColor === color ? 'selected' : ''} onClick={() => setSelectedColor(color)}>
@@ -423,7 +566,7 @@ export default function App() {
               </div>
             </div>
             <div className="option-block">
-              <strong>ไซซ์</strong>
+              <strong>{t.size}</strong>
               <div className="sizes">
                 {activeSizes.map((size) => (
                   <button disabled={(active.stockBySize[size] || 0) === 0} key={size} className={selectedSize === size ? 'selected' : ''} onClick={() => setSelectedSize(size)}>
@@ -431,10 +574,10 @@ export default function App() {
                   </button>
                 ))}
               </div>
-              <small>มีสินค้าไซซ์ {selectedSize} เหลือ {selectedStock} ชิ้น</small>
+              <small>{t.stockLeft} {selectedSize} {t.leftUnit} {selectedStock} {t.pieces}</small>
             </div>
             <div className="option-block">
-              <strong>จำนวน</strong>
+              <strong>{t.quantity}</strong>
               <div className="quantity-control">
                 <button onClick={() => setDetailQuantity((value) => Math.max(1, value - 1))}><Minus size={16} /></button>
                 <input type="number" value={detailQuantity} min="1" max={selectedStock} onChange={(event) => setDetailQuantity(Math.min(selectedStock || 1, Math.max(1, Number(event.target.value) || 1)))} />
@@ -442,9 +585,9 @@ export default function App() {
               </div>
             </div>
             <div className="detail-actions">
-              <button className="secondary" onClick={() => addToCart(active, 'product')}><ShoppingBag size={18} /> เพิ่มลงตะกร้า</button>
-              <button onClick={() => addToCart(active, 'checkout')}><CreditCard size={18} /> ซื้อเลย</button>
-              <button className="line-button" onClick={() => openLineOrder(active)}>สั่งผ่าน LINE</button>
+              <button className="secondary" onClick={() => addToCart(active, 'product')}><ShoppingBag size={18} /> {t.addToCart}</button>
+              <button onClick={() => addToCart(active, 'checkout')}><CreditCard size={18} /> {t.buyNow}</button>
+              <button className="line-button" onClick={() => openLineOrder(active)}>{t.orderLine}</button>
             </div>
           </div>
         </section>
@@ -453,25 +596,25 @@ export default function App() {
       {view === 'checkout' && (
         <section className="checkout-grid">
           <div className="panel account-summary">
-            <h2><Package size={20} /> ข้อมูลติดต่อ</h2>
+            <h2><Package size={20} /> {t.contactInfo}</h2>
             <label>
-              ชื่อผู้สั่ง
-              <input placeholder="ชื่อผู้สั่ง" value={checkout.customerName} onChange={(event) => setCheckout({ ...checkout, customerName: event.target.value })} />
+              {t.customerName}
+              <input placeholder={t.customerName} value={checkout.customerName} onChange={(event) => setCheckout({ ...checkout, customerName: event.target.value })} />
             </label>
             <label>
-              เบอร์โทร / LINE ID
-              <input placeholder="เบอร์โทร / LINE ID" value={checkout.customerContact} onChange={(event) => setCheckout({ ...checkout, customerContact: event.target.value })} />
+              {t.customerContact}
+              <input placeholder={t.customerContact} value={checkout.customerContact} onChange={(event) => setCheckout({ ...checkout, customerContact: event.target.value })} />
             </label>
-            <p>ร้านจะใช้ข้อมูลนี้ติดต่อกลับเพื่อยืนยันสี ไซซ์ โปร และการชำระเงินผ่าน LINE @nate.store12</p>
+            <p>{t.contactNote}</p>
           </div>
           <div className="panel">
-            <h2><ShoppingBag size={20} /> ตะกร้าสินค้า</h2>
-            {cart.length === 0 ? <p>ยังไม่มีสินค้าในตะกร้า</p> : cart.map((item) => {
+            <h2><ShoppingBag size={20} /> {t.cart}</h2>
+            {cart.length === 0 ? <p>{t.emptyCart}</p> : cart.map((item) => {
               const product = products.find((entry) => entry.id === item.productId);
               if (!product) return null;
               return <div className="cart-row" key={`${item.productId}-${item.color}-${item.size}`}>
                 <img src={product.image} alt={product.name} />
-                <div><strong>{product.name}</strong><span>สี {item.color || product.colors[0]} | ไซซ์ {item.size} | {formatBaht(product.price)}</span></div>
+                <div><strong>{product.name}</strong><span>{t.color} {item.color || product.colors[0]} | {t.size} {item.size} | {formatBaht(product.price)}</span></div>
                 <div className="stepper">
                   <button onClick={() => updateCart(item.productId, item.color, item.size, -1)}><Minus size={14} /></button>
                   <b>{item.quantity}</b>
@@ -479,18 +622,18 @@ export default function App() {
                 </div>
               </div>;
             })}
-            <div className="totals"><span>สินค้า</span><b>{formatBaht(totals.subtotal)}</b><span>จัดส่ง</span><b>{formatBaht(totals.shipping)}</b><span>รวม</span><b>{formatBaht(totals.total)}</b></div>
+            <div className="totals"><span>{t.subtotal}</span><b>{formatBaht(totals.subtotal)}</b><span>{t.shipping}</span><b>{formatBaht(totals.shipping)}</b><span>{t.total}</span><b>{formatBaht(totals.total)}</b></div>
           </div>
           <form className="panel form" onSubmit={submitOrder}>
-            <h2><CreditCard size={20} /> สั่งซื้อและชำระเงิน</h2>
-            <textarea placeholder="ที่อยู่จัดส่ง" value={checkout.address} onChange={(event) => setCheckout({ ...checkout, address: event.target.value })} />
+            <h2><CreditCard size={20} /> {t.orderPayment}</h2>
+            <textarea placeholder={t.address} value={checkout.address} onChange={(event) => setCheckout({ ...checkout, address: event.target.value })} />
             <div className="payment-options">
               {Object.entries(paymentLabels).map(([key, label]) => (
-                <label key={key}><input type="radio" checked={checkout.paymentMethod === key} onChange={() => setCheckout({ ...checkout, paymentMethod: key })} /> {label}</label>
+                <label key={key}><input type="radio" checked={checkout.paymentMethod === key} onChange={() => setCheckout({ ...checkout, paymentMethod: key })} /> {labelPayment(key, label)}</label>
               ))}
             </div>
-            <button disabled={cart.length === 0 || !checkout.customerName.trim() || !checkout.customerContact.trim()}>ยืนยันคำสั่งซื้อ</button>
-            <button className="line-button" type="button" disabled={cart.length === 0} onClick={() => openLineOrder()}>ส่งตะกร้าผ่าน LINE</button>
+            <button disabled={cart.length === 0 || !checkout.customerName.trim() || !checkout.customerContact.trim()}>{t.confirmOrder}</button>
+            <button className="line-button" type="button" disabled={cart.length === 0} onClick={() => openLineOrder()}>{t.sendCartLine}</button>
           </form>
         </section>
       )}
@@ -498,13 +641,13 @@ export default function App() {
       {view === 'admin' && (
         <section className="admin">
           <div className="metric-row">
-            <div><BarChart3 /><span>ยอดขาย</span><b>{formatBaht(revenue)}</b></div>
-            <div><Package /><span>ออเดอร์</span><b>{orders.length}</b></div>
-            <div><Boxes /><span>สินค้าใกล้หมด</span><b>{lowStock.length}</b></div>
+            <div><BarChart3 /><span>{t.dashboardSales}</span><b>{formatBaht(revenue)}</b></div>
+            <div><Package /><span>{t.dashboardOrders}</span><b>{orders.length}</b></div>
+            <div><Boxes /><span>{t.dashboardLowStock}</span><b>{lowStock.length}</b></div>
           </div>
           <div className="admin-grid">
             <section className="panel">
-              <h2>จัดการสินค้าและสต๊อก</h2>
+              <h2>{t.manageProducts}</h2>
               <div className="table">
                 {products.map((product) => <div className="table-row" key={product.id}>
                   <strong>{product.name}<small>{product.category}</small></strong>
@@ -514,8 +657,8 @@ export default function App() {
               </div>
             </section>
             <section className="panel">
-              <h2>จัดการออเดอร์</h2>
-              {orders.length === 0 ? <p>ยังไม่มีออเดอร์</p> : orders.map((order) => <div className="order-card" key={order.id}>
+              <h2>{t.manageOrders}</h2>
+              {orders.length === 0 ? <p>{t.noOrders}</p> : orders.map((order) => <div className="order-card" key={order.id}>
                 <strong>{order.id}</strong>
                 <span>{order.customer.name} | {formatBaht(order.totals.total)}</span>
                 <select value={order.status} onChange={(event) => setOrders((items) => items.map((entry) => entry.id === order.id ? { ...entry, status: event.target.value } : entry))}>
