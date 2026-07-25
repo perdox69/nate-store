@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart3, Boxes, CreditCard, Heart, LogOut, Minus, Package, Plus, Search, ShoppingBag, UserRound, X } from 'lucide-react';
-import { brands, categories, guides, popularSearches, priceRanges, products as seedProducts } from './data/catalog';
+import { brands, categories, popularSearches, priceRanges, products as seedProducts } from './data/catalog';
 import { filterProducts } from './lib/catalog';
 import { addCartItem, applyOrderToInventory, buildLineCustomer, calculateCartTotals, createOrder, formatBaht, paymentLabels } from './lib/ecommerce';
 import { createMemberAccount, loginMemberAccount } from './lib/auth';
@@ -295,13 +295,6 @@ export default function App() {
             <img src={active.image} alt={active.name} />
           </section>
 
-          <section className="service-strip">
-            <div><strong>LINE @nate.store12</strong><span>สอบถามเพิ่มเติมและสั่งซื้อได้ทันที</span></div>
-            <div><strong>ส่งเหมา 50 บาท</strong><span>หลายรายการมีโปรส่งเหมา</span></div>
-            <div><strong>สกรีนฟรี</strong><span>สินค้า Ari หลายชิ้นสกรีนฟรี</span></div>
-            <div><strong>ถุงฟรี</strong><span>หลายรายการแถมถุงกระดาษหรือถุงผ้า</span></div>
-          </section>
-
           <section className="category-showcase">
             {categories.slice(0, 6).map((entry, index) => (
               <button
@@ -317,42 +310,11 @@ export default function App() {
             ))}
           </section>
 
-          <section className="collection-band">
-            <img src={products[0]?.image} alt="Football boots collection" />
-            <div>
-              <p>Best Seller</p>
-              <h2>สินค้า Ari ขายดีของร้าน</h2>
-              <span>รวมสินค้า Ari ที่ลูกค้าถามบ่อย เช่น รองเท้าแตะ กระเป๋า gymsack เสื้อบอล เชือกรองเท้า และ accessories พร้อมโปรรวมส่ง/สกรีนฟรีตามรายการ</span>
-              <button onClick={() => {
-                setCategory('สินค้าขายดี');
-                document.getElementById('new-arrivals')?.scrollIntoView({ behavior: 'smooth' });
-              }}>ดูสินค้าขายดี</button>
-            </div>
-          </section>
-
-          <section className="look-section">
-            <div className="section-heading">
-              <div>
-                <p>Set จับคู่</p>
-                <h2>เซ็ตพร้อมส่งตามร้าน</h2>
-              </div>
-            </div>
-            <div className="look-grid">
-              {products.slice(3, 6).map((product) => (
-                <button key={product.id} onClick={() => openProduct(product)}>
-                  <img src={product.image} alt={product.name} />
-                  <span>{product.name}</span>
-                  <strong>{formatBaht(product.price)}</strong>
-                </button>
-              ))}
-            </div>
-          </section>
-
           <section className="shop-section" id="new-arrivals">
             <div className="section-heading">
               <div>
                 <p>nate.store12 catalog</p>
-                <h2>เลือกสินค้าแล้วทัก LINE ได้เลย</h2>
+                <h2>สินค้าแนะนำ</h2>
               </div>
               <label className="search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ค้นหาสินค้า" /></label>
             </div>
@@ -399,30 +361,11 @@ export default function App() {
               ))}
             </section>
 
-            <section className="brand-wall">
-              <p>เลือกตามกลุ่มสินค้า</p>
-              <div>
-                {brands.map((entry) => <button key={entry} onClick={() => setBrand(entry)}>{entry}</button>)}
-              </div>
+            <section className="order-guide">
+              <div><strong>1</strong><span>กดเลือกสินค้า ดูสี ไซซ์ และจำนวน</span></div>
+              <div><strong>2</strong><span>เพิ่มลงตะกร้าหรือกดซื้อเลย</span></div>
+              <div><strong>3</strong><span>กรอกชื่อ เบอร์/LINE ID แล้วให้ร้านยืนยันยอด</span></div>
             </section>
-
-            <section className="guide-grid">
-              {guides.map((guide) => (
-                <article key={guide.title}>
-                  <span>{guide.category}</span>
-                  <h3>{guide.title}</h3>
-                  <p>{guide.excerpt}</p>
-                </article>
-              ))}
-            </section>
-
-            <footer className="newsletter">
-              <h2>สอบถามราคา รูปจริง และสั่งซื้อผ่าน LINE</h2>
-              <div>
-                <input placeholder="พิมพ์สินค้าที่สนใจ เช่น gymsack / รองเท้า+เสื้อ" />
-                <button onClick={() => window.open(LINE_URL, '_blank')}>LINE @nate.store12</button>
-              </div>
-            </footer>
           </section>
         </>
       )}
