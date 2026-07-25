@@ -15,8 +15,6 @@ const copy = {
   th: {
     searchPlaceholder: 'คุณกำลังค้นหาอะไร?',
     accountTitle: 'เข้าสู่ระบบ/สมัครสมาชิก',
-    userRole: 'สำหรับลูกค้า',
-    adminRole: 'สำหรับแอดมิน',
     adminHint: '',
     name: 'ชื่อ',
     yourName: 'ชื่อของคุณ',
@@ -72,8 +70,6 @@ const copy = {
   en: {
     searchPlaceholder: 'What are you looking for?',
     accountTitle: 'Login / Register',
-    userRole: 'Customer',
-    adminRole: 'Staff',
     adminHint: '',
     name: 'Name',
     yourName: 'Your name',
@@ -202,7 +198,6 @@ export default function App() {
   const [language, setLanguage] = useState(() => loadState('nate-store-language', 'th'));
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
-  const [authRole, setAuthRole] = useState('user');
   const [authForm, setAuthForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [checkout, setCheckout] = useState({ customerName: '', customerContact: '', address: '', paymentMethod: 'qr' });
 
@@ -273,7 +268,6 @@ export default function App() {
 
   function openAuth(mode = 'login') {
     setAuthMode(mode);
-    setAuthRole('user');
     setAuthForm({ name: '', email: '', phone: '', password: '' });
     setAuthOpen(true);
   }
@@ -281,10 +275,7 @@ export default function App() {
   function submitAuth(event) {
     event.preventDefault();
     try {
-      if (authRole === 'admin') {
-        if (authForm.email.trim().toLowerCase() !== ADMIN_EMAIL || authForm.password.trim() !== ADMIN_PASSWORD) {
-          throw new Error(language === 'en' ? 'Admin email or password is incorrect' : 'อีเมลหรือรหัสผ่านแอดมินไม่ถูกต้อง');
-        }
+      if (authMode === 'login' && authForm.email.trim().toLowerCase() === ADMIN_EMAIL && authForm.password.trim() === ADMIN_PASSWORD) {
         setMember({ id: 'ADMIN-1', name: 'Admin', email: ADMIN_EMAIL, role: 'admin' });
         setNotice(language === 'en' ? 'Logged in as admin' : 'เข้าสู่ระบบแอดมินสำเร็จ');
         setAuthOpen(false);
@@ -428,13 +419,7 @@ export default function App() {
             <form className="auth-card modal-card" onSubmit={submitAuth}>
               <button className="close-modal" type="button" onClick={() => setAuthOpen(false)} aria-label="ปิด"><X size={22} /></button>
               <h2>{t.accountTitle}</h2>
-              {authMode === 'login' && (
-                <div className="role-tabs">
-                  <button type="button" className={authRole === 'user' ? 'selected' : ''} onClick={() => setAuthRole('user')}>{t.userRole}</button>
-                  <button type="button" className={authRole === 'admin' ? 'selected' : ''} onClick={() => setAuthRole('admin')}>{t.adminRole}</button>
-                </div>
-              )}
-              {authMode === 'register' && authRole === 'user' && (
+              {authMode === 'register' && (
                 <label>
                   {t.name}
                   <input value={authForm.name} onChange={(event) => setAuthForm({ ...authForm, name: event.target.value })} placeholder={t.yourName} />
@@ -449,11 +434,9 @@ export default function App() {
                 <input type="password" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} placeholder={authMode === 'register' ? t.passwordPlaceholder : t.password} />
               </label>
               <button disabled={!authForm.email.trim() || !authForm.password.trim()}>{authMode === 'login' ? t.login : t.register}</button>
-              {authRole === 'user' && (
-                <button className="secondary" type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}>
-                  {authMode === 'login' ? t.switchRegister : t.switchLogin}
-                </button>
-              )}
+              <button className="secondary" type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}>
+                {authMode === 'login' ? t.switchRegister : t.switchLogin}
+              </button>
             </form>
           </div>
         </section>
