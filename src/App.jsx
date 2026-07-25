@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart3, Boxes, CreditCard, Heart, LogOut, Minus, Package, Plus, Search, ShoppingBag, UserRound, X } from 'lucide-react';
-import { brands, categories, popularSearches, priceRanges, products as seedProducts } from './data/catalog';
+import { categories, popularSearches, priceRanges, products as seedProducts } from './data/catalog';
 import { filterProducts } from './lib/catalog';
 import { addCartItem, applyOrderToInventory, buildLineCustomer, calculateCartTotals, createOrder, formatBaht, paymentLabels } from './lib/ecommerce';
 import { createMemberAccount, loginMemberAccount } from './lib/auth';
@@ -49,7 +49,6 @@ export default function App() {
   const [member, setMember] = useState(() => loadState('nate-store-member', null));
   const [cart, setCart] = useState(() => loadList(CART_STORAGE_KEY));
   const [category, setCategory] = useState('All');
-  const [brand, setBrand] = useState('All');
   const [priceRange, setPriceRange] = useState('All');
   const [query, setQuery] = useState('');
   const [selectedSize, setSelectedSize] = useState(Object.keys(seedProducts[0].stockBySize)[0]);
@@ -69,8 +68,8 @@ export default function App() {
   useEffect(() => saveState(CART_STORAGE_KEY, cart), [cart]);
 
   const filteredProducts = useMemo(() => {
-    return filterProducts({ products, category, brand, query, priceRange });
-  }, [brand, category, priceRange, products, query]);
+    return filterProducts({ products, category, brand: 'All', query, priceRange });
+  }, [category, priceRange, products, query]);
 
   const active = products.find((product) => product.id === activeProduct) || products[0] || seedProducts[0];
   const activeSizes = Object.keys(active.stockBySize);
@@ -340,11 +339,6 @@ export default function App() {
             <div className="filter-list">
               {['All', ...categories].map((entry) => (
                 <button key={entry} className={category === entry ? 'selected' : ''} onClick={() => setCategory(entry)}>{entry}</button>
-              ))}
-            </div>
-            <div className="filter-list compact-filter">
-              {['All', ...brands].map((entry) => (
-                <button key={entry} className={brand === entry ? 'selected' : ''} onClick={() => setBrand(entry)}>{entry}</button>
               ))}
             </div>
             <div className="filter-list compact-filter">
