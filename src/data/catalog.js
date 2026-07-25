@@ -220,7 +220,7 @@ export const products = [
     category: 'กางเกง Ari',
     brand: 'Ari',
     price: 590,
-    image: 'https://images.unsplash.com/photo-1506629905607-d9c297d4d98d?auto=format&fit=crop&w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80',
     colors: ['Black', 'Navy'],
     stockBySize: { S: 8, M: 10, L: 8, XL: 4 },
     tags: ['กางเกงบอล', 'กางเกงขาสั้น ari', 'ฟรีถุง'],

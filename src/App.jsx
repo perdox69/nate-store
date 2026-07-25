@@ -14,7 +14,26 @@ const LINE_URL = 'https://line.me/R/ti/p/@nate.store12';
 
 function loadProducts() {
   const storedProducts = loadState(PRODUCT_STORAGE_KEY, seedProducts);
-  return Array.isArray(storedProducts) && storedProducts.length > 0 ? storedProducts : seedProducts;
+  if (!Array.isArray(storedProducts) || storedProducts.length === 0) {
+    return seedProducts;
+  }
+
+  return seedProducts.map((seedProduct) => {
+    const storedProduct = storedProducts.find((entry) => entry.id === seedProduct.id);
+    return storedProduct
+      ? {
+          ...storedProduct,
+          name: seedProduct.name,
+          category: seedProduct.category,
+          brand: seedProduct.brand,
+          image: seedProduct.image,
+          colors: seedProduct.colors,
+          tags: seedProduct.tags,
+          perks: seedProduct.perks,
+          description: seedProduct.description
+        }
+      : seedProduct;
+  });
 }
 
 function loadList(key) {
