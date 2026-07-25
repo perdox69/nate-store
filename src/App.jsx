@@ -15,10 +15,9 @@ const copy = {
   th: {
     searchPlaceholder: 'คุณกำลังค้นหาอะไร?',
     accountTitle: 'เข้าสู่ระบบ/สมัครสมาชิก',
-    userRole: 'User',
-    adminRole: 'Admin',
-    adminHint: 'Admin demo: admin@nate.store12.com / admin123',
-    modalCopy: 'ปลดล็อกศักยภาพสูงสุดของคุณ! ช้อปอุปกรณ์กีฬา พร้อมดีลสุดคุ้ม',
+    userRole: 'สำหรับลูกค้า',
+    adminRole: 'สำหรับแอดมิน',
+    adminHint: '',
     name: 'ชื่อ',
     yourName: 'ชื่อของคุณ',
     email: 'อีเมล',
@@ -73,10 +72,9 @@ const copy = {
   en: {
     searchPlaceholder: 'What are you looking for?',
     accountTitle: 'Login / Register',
-    userRole: 'User',
-    adminRole: 'Admin',
-    adminHint: 'Admin demo: admin@nate.store12.com / admin123',
-    modalCopy: 'Unlock member benefits, faster checkout, and exclusive sports deals.',
+    userRole: 'Customer',
+    adminRole: 'Staff',
+    adminHint: '',
     name: 'Name',
     yourName: 'Your name',
     email: 'Email',
@@ -430,14 +428,12 @@ export default function App() {
             <form className="auth-card modal-card" onSubmit={submitAuth}>
               <button className="close-modal" type="button" onClick={() => setAuthOpen(false)} aria-label="ปิด"><X size={22} /></button>
               <h2>{t.accountTitle}</h2>
-              <p>{t.modalCopy}</p>
               {authMode === 'login' && (
                 <div className="role-tabs">
                   <button type="button" className={authRole === 'user' ? 'selected' : ''} onClick={() => setAuthRole('user')}>{t.userRole}</button>
                   <button type="button" className={authRole === 'admin' ? 'selected' : ''} onClick={() => setAuthRole('admin')}>{t.adminRole}</button>
                 </div>
               )}
-              {authRole === 'admin' && <small className="admin-hint">{t.adminHint}</small>}
               {authMode === 'register' && authRole === 'user' && (
                 <label>
                   {t.name}
