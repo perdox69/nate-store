@@ -65,7 +65,12 @@ const copy = {
     dashboardLowStock: 'สินค้าใกล้หมด',
     manageProducts: 'จัดการสินค้าและสต๊อก',
     manageOrders: 'จัดการออเดอร์',
-    noOrders: 'ยังไม่มีออเดอร์'
+    noOrders: 'ยังไม่มีออเดอร์',
+    orderSuccess: 'สั่งซื้อสำเร็จ',
+    orderSuccessCopy: 'ร้านได้รับออเดอร์แล้ว และจะติดต่อกลับเพื่อยืนยันสินค้า สี ไซซ์ และการชำระเงิน',
+    orderId: 'เลขออเดอร์',
+    continueShopping: 'เลือกสินค้าต่อ',
+    goToLine: 'ทัก LINE ร้าน'
   },
   en: {
     searchPlaceholder: 'What are you looking for?',
@@ -120,7 +125,12 @@ const copy = {
     dashboardLowStock: 'Low stock',
     manageProducts: 'Products and stock',
     manageOrders: 'Orders',
-    noOrders: 'No orders yet'
+    noOrders: 'No orders yet',
+    orderSuccess: 'Order placed',
+    orderSuccessCopy: 'The shop received your order and will contact you to confirm items, color, size, and payment.',
+    orderId: 'Order ID',
+    continueShopping: 'Continue shopping',
+    goToLine: 'Chat on LINE'
   }
 };
 const categoryLabelsEn = {
@@ -195,6 +205,7 @@ export default function App() {
   const [detailQuantity, setDetailQuantity] = useState(1);
   const [activeProduct, setActiveProduct] = useState(seedProducts[0].id);
   const [notice, setNotice] = useState('');
+  const [lastOrder, setLastOrder] = useState(null);
   const [language, setLanguage] = useState(() => loadState('nate-store-language', 'th'));
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
@@ -340,8 +351,9 @@ export default function App() {
       setOrders((items) => [order, ...items]);
       setProducts((items) => applyOrderToInventory(items, order));
       setCart([]);
+      setLastOrder(order);
       setNotice(`สร้างออเดอร์ ${order.id} สำเร็จ`);
-      setView('admin');
+      setView('order-success');
     } catch (error) {
       setNotice(error.message);
     }
@@ -647,7 +659,27 @@ export default function App() {
         </section>
       )}
 
-      {view === 'admin' && (
+      {view === 'order-success' && lastOrder && (
+        <section className="order-success">
+          <div className="panel">
+            <span className="category-pill">{t.orderSuccess}</span>
+            <h1>{t.orderSuccess}</h1>
+            <p>{t.orderSuccessCopy}</p>
+            <div className="success-summary">
+              <span>{t.orderId}</span>
+              <strong>{lastOrder.id}</strong>
+              <span>{t.total}</span>
+              <strong>{formatBaht(lastOrder.totals.total)}</strong>
+            </div>
+            <div className="hero-actions">
+              <button onClick={() => setView('shop')}>{t.continueShopping}</button>
+              <button className="line-button" onClick={() => window.open(LINE_URL, '_blank')}>{t.goToLine}</button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {view === 'admin' && member?.role === 'admin' && (
         <section className="admin">
           <div className="metric-row">
             <div><BarChart3 /><span>{t.dashboardSales}</span><b>{formatBaht(revenue)}</b></div>
