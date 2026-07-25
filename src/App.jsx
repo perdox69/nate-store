@@ -249,7 +249,7 @@ export default function App() {
             <ShoppingBag size={24} />
             {totals.itemCount > 0 && <b>{totals.itemCount}</b>}
           </button>
-          <button className="language-pill" title="ภาษาไทย"><span>🇹🇭</span><strong>TH</strong></button>
+          <button className="language-pill" title="ภาษาไทย"><strong>TH</strong></button>
         </div>
       </header>
 
