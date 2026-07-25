@@ -15,6 +15,9 @@ const copy = {
   th: {
     searchPlaceholder: 'คุณกำลังค้นหาอะไร?',
     accountTitle: 'เข้าสู่ระบบ/สมัครสมาชิก',
+    userRole: 'User',
+    adminRole: 'Admin',
+    adminHint: 'Admin demo: admin@nate.store12.com / admin123',
     modalCopy: 'ปลดล็อกศักยภาพสูงสุดของคุณ! ช้อปอุปกรณ์กีฬา พร้อมดีลสุดคุ้ม',
     name: 'ชื่อ',
     yourName: 'ชื่อของคุณ',
@@ -70,6 +73,9 @@ const copy = {
   en: {
     searchPlaceholder: 'What are you looking for?',
     accountTitle: 'Login / Register',
+    userRole: 'User',
+    adminRole: 'Admin',
+    adminHint: 'Admin demo: admin@nate.store12.com / admin123',
     modalCopy: 'Unlock member benefits, faster checkout, and exclusive sports deals.',
     name: 'Name',
     yourName: 'Your name',
@@ -148,6 +154,8 @@ const paymentLabelsEn = {
   bank: 'Bank transfer',
   cod: 'Cash on delivery'
 };
+const ADMIN_EMAIL = 'admin@nate.store12.com';
+const ADMIN_PASSWORD = 'admin123';
 
 function loadProducts() {
   const storedProducts = loadState(PRODUCT_STORAGE_KEY, seedProducts);
@@ -196,6 +204,7 @@ export default function App() {
   const [language, setLanguage] = useState(() => loadState('nate-store-language', 'th'));
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
+  const [authRole, setAuthRole] = useState('user');
   const [authForm, setAuthForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [checkout, setCheckout] = useState({ customerName: '', customerContact: '', address: '', paymentMethod: 'qr' });
 
@@ -266,6 +275,7 @@ export default function App() {
 
   function openAuth(mode = 'login') {
     setAuthMode(mode);
+    setAuthRole('user');
     setAuthForm({ name: '', email: '', phone: '', password: '' });
     setAuthOpen(true);
   }
@@ -273,6 +283,17 @@ export default function App() {
   function submitAuth(event) {
     event.preventDefault();
     try {
+      if (authRole === 'admin') {
+        if (authForm.email.trim().toLowerCase() !== ADMIN_EMAIL || authForm.password.trim() !== ADMIN_PASSWORD) {
+          throw new Error(language === 'en' ? 'Admin email or password is incorrect' : 'อีเมลหรือรหัสผ่านแอดมินไม่ถูกต้อง');
+        }
+        setMember({ id: 'ADMIN-1', name: 'Admin', email: ADMIN_EMAIL, role: 'admin' });
+        setNotice(language === 'en' ? 'Logged in as admin' : 'เข้าสู่ระบบแอดมินสำเร็จ');
+        setAuthOpen(false);
+        setView('admin');
+        return;
+      }
+
       if (authMode === 'register') {
         const result = createMemberAccount({
           accounts,
@@ -410,7 +431,14 @@ export default function App() {
               <button className="close-modal" type="button" onClick={() => setAuthOpen(false)} aria-label="ปิด"><X size={22} /></button>
               <h2>{t.accountTitle}</h2>
               <p>{t.modalCopy}</p>
-              {authMode === 'register' && (
+              {authMode === 'login' && (
+                <div className="role-tabs">
+                  <button type="button" className={authRole === 'user' ? 'selected' : ''} onClick={() => setAuthRole('user')}>{t.userRole}</button>
+                  <button type="button" className={authRole === 'admin' ? 'selected' : ''} onClick={() => setAuthRole('admin')}>{t.adminRole}</button>
+                </div>
+              )}
+              {authRole === 'admin' && <small className="admin-hint">{t.adminHint}</small>}
+              {authMode === 'register' && authRole === 'user' && (
                 <label>
                   {t.name}
                   <input value={authForm.name} onChange={(event) => setAuthForm({ ...authForm, name: event.target.value })} placeholder={t.yourName} />
@@ -425,9 +453,11 @@ export default function App() {
                 <input type="password" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} placeholder={authMode === 'register' ? t.passwordPlaceholder : t.password} />
               </label>
               <button disabled={!authForm.email.trim() || !authForm.password.trim()}>{authMode === 'login' ? t.login : t.register}</button>
-              <button className="secondary" type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}>
-                {authMode === 'login' ? t.switchRegister : t.switchLogin}
-              </button>
+              {authRole === 'user' && (
+                <button className="secondary" type="button" onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}>
+                  {authMode === 'login' ? t.switchRegister : t.switchLogin}
+                </button>
+              )}
             </form>
           </div>
         </section>

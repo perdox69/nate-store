@@ -266,6 +266,27 @@ nav {
   padding: 0;
 }
 
+.role-tabs {
+  border: 1px solid #dedbd4;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.role-tabs button {
+  background: #fff;
+  color: #242424;
+}
+
+.role-tabs .selected {
+  background: #242424;
+  color: #fff;
+}
+
+.admin-hint {
+  color: #6c665f;
+  line-height: 1.5;
+}
+
 .hero {
   align-items: center;
   display: grid;
