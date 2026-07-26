@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addCartItem, applyOrderToInventory, buildLineCustomer, calculateCartTotals, createOrder } from './ecommerce';
+import { addCartItem, applyOrderToInventory, buildAdminProduct, buildLineCustomer, calculateCartTotals, createOrder } from './ecommerce';
 
 const products = [
   {
@@ -117,5 +117,34 @@ describe('ecommerce helpers', () => {
   it('requires customer name and contact for LINE checkout', () => {
     expect(() => buildLineCustomer({ name: '', contact: '@mali.line' })).toThrow('กรุณากรอกชื่อผู้สั่ง');
     expect(() => buildLineCustomer({ name: 'Mali', contact: '' })).toThrow('กรุณากรอกเบอร์โทรหรือ LINE ID');
+  });
+
+  it('builds a product from admin form fields', () => {
+    const product = buildAdminProduct({
+      name: 'Test Shirt',
+      category: 'เสื้อ Ari',
+      price: '590',
+      image: 'https://example.com/shirt.jpg',
+      colors: 'Black, White',
+      sizes: 'S:4, M:6'
+    });
+
+    expect(product).toMatchObject({
+      name: 'Test Shirt',
+      category: 'เสื้อ Ari',
+      brand: 'Nate Store',
+      price: 590,
+      image: 'https://example.com/shirt.jpg',
+      colors: ['Black', 'White'],
+      stockBySize: { S: 4, M: 6 },
+      customImage: true
+    });
+    expect(product.id).toMatch(/^custom-test-shirt-/);
+  });
+
+  it('requires name, image, and stock when building an admin product', () => {
+    expect(() => buildAdminProduct({ name: '', image: 'https://example.com/a.jpg', sizes: 'OS:1' })).toThrow('กรุณากรอกชื่อสินค้า');
+    expect(() => buildAdminProduct({ name: 'Bag', image: '', sizes: 'OS:1' })).toThrow('กรุณาใส่ URL รูปสินค้า');
+    expect(() => buildAdminProduct({ name: 'Bag', image: 'https://example.com/a.jpg', sizes: '' })).toThrow('กรุณากรอกไซซ์และสต๊อก');
   });
 });

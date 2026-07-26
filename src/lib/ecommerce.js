@@ -113,6 +113,57 @@ export function buildLineCustomer({ name, contact }) {
   };
 }
 
+export function buildAdminProduct({ name, category = 'สินค้าอื่นๆ', price, image, colors, sizes }) {
+  const cleanName = name?.trim();
+  const cleanImage = image?.trim();
+  const sizeText = sizes?.trim();
+
+  if (!cleanName) {
+    throw new Error('กรุณากรอกชื่อสินค้า');
+  }
+  if (!cleanImage) {
+    throw new Error('กรุณาใส่ URL รูปสินค้า');
+  }
+  if (!sizeText) {
+    throw new Error('กรุณากรอกไซซ์และสต๊อก');
+  }
+
+  const stockBySize = sizeText.split(',').reduce((stock, pair) => {
+    const [rawSize, rawStock] = pair.split(':');
+    const size = rawSize?.trim();
+    const quantity = Math.max(0, Number(rawStock?.trim()) || 0);
+    if (size) {
+      stock[size] = quantity;
+    }
+    return stock;
+  }, {});
+
+  if (Object.keys(stockBySize).length === 0) {
+    throw new Error('กรุณากรอกไซซ์และสต๊อก');
+  }
+
+  const slug = cleanName
+    .toLowerCase()
+    .replace(/[^a-z0-9ก-๙]+/gi, '-')
+    .replace(/^-+|-+$/g, '') || 'product';
+
+  return {
+    id: `custom-${slug}-${Date.now()}`,
+    name: cleanName,
+    category,
+    brand: 'Nate Store',
+    price: Math.max(0, Number(price) || 0),
+    image: cleanImage,
+    colors: colors?.split(',').map((color) => color.trim()).filter(Boolean) || ['Default'],
+    stockBySize,
+    tags: [cleanName, category],
+    perks: [],
+    description: cleanName,
+    customImage: true,
+    customProduct: true
+  };
+}
+
 export function applyOrderToInventory(products, order) {
   return products.map((product) => {
     const orderedItems = order.items.filter((item) => item.productId === product.id);

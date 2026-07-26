@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart3, Boxes, CreditCard, Heart, LogOut, Minus, Package, Plus, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import { categories, popularSearches, priceRanges, products as seedProducts } from './data/catalog';
 import { filterProducts } from './lib/catalog';
-import { addCartItem, applyOrderToInventory, buildLineCustomer, calculateCartTotals, createOrder, formatBaht, paymentLabels } from './lib/ecommerce';
+import { addCartItem, applyOrderToInventory, buildAdminProduct, buildLineCustomer, calculateCartTotals, createOrder, formatBaht, paymentLabels } from './lib/ecommerce';
 import { createMemberAccount, loginMemberAccount } from './lib/auth';
 import { loadState, saveState } from './lib/store';
 
@@ -167,7 +167,7 @@ function loadProducts() {
     return seedProducts;
   }
 
-  return seedProducts.map((seedProduct) => {
+  const syncedProducts = seedProducts.map((seedProduct) => {
     const storedProduct = storedProducts.find((entry) => entry.id === seedProduct.id);
     return storedProduct
       ? {
@@ -175,14 +175,16 @@ function loadProducts() {
           name: seedProduct.name,
           category: seedProduct.category,
           brand: seedProduct.brand,
-          image: seedProduct.image,
+          image: storedProduct.customImage ? storedProduct.image : seedProduct.image,
           colors: seedProduct.colors,
           tags: seedProduct.tags,
           perks: seedProduct.perks,
           description: seedProduct.description
-        }
+      }
       : seedProduct;
   });
+  const customProducts = storedProducts.filter((product) => product.customProduct);
+  return [...syncedProducts, ...customProducts];
 }
 
 function loadList(key) {
@@ -210,6 +212,14 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', phone: '', password: '' });
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    category: categories[0],
+    price: '',
+    image: '',
+    colors: 'Black, White',
+    sizes: 'OS:10'
+  });
   const [checkout, setCheckout] = useState({ customerName: '', customerContact: '', address: '', paymentMethod: 'qr' });
 
   useEffect(() => saveState(PRODUCT_STORAGE_KEY, products), [products]);
@@ -371,6 +381,29 @@ export default function App() {
 
   function updateProductPrice(productId, value) {
     setProducts((items) => items.map((product) => (product.id === productId ? { ...product, price: Math.max(0, Number(value)) } : product)));
+  }
+
+  function updateProductImage(productId, value) {
+    setProducts((items) => items.map((product) => (product.id === productId ? { ...product, image: value, customImage: true } : product)));
+  }
+
+  function addAdminProduct(event) {
+    event.preventDefault();
+    try {
+      const product = buildAdminProduct(newProduct);
+      setProducts((items) => [product, ...items]);
+      setNewProduct({
+        name: '',
+        category: categories[0],
+        price: '',
+        image: '',
+        colors: 'Black, White',
+        sizes: 'OS:10'
+      });
+      setNotice(`เพิ่มสินค้า ${product.name} แล้ว`);
+    } catch (error) {
+      setNotice(error.message);
+    }
   }
 
   function openLineOrder(product = null) {
@@ -689,10 +722,22 @@ export default function App() {
           <div className="admin-grid">
             <section className="panel">
               <h2>{t.manageProducts}</h2>
+              <form className="admin-product-form" onSubmit={addAdminProduct}>
+                <input value={newProduct.name} onChange={(event) => setNewProduct({ ...newProduct, name: event.target.value })} placeholder="ชื่อสินค้าใหม่" />
+                <select value={newProduct.category} onChange={(event) => setNewProduct({ ...newProduct, category: event.target.value })}>
+                  {categories.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
+                </select>
+                <input type="number" value={newProduct.price} onChange={(event) => setNewProduct({ ...newProduct, price: event.target.value })} placeholder="ราคา" />
+                <input value={newProduct.image} onChange={(event) => setNewProduct({ ...newProduct, image: event.target.value })} placeholder="URL รูปสินค้า" />
+                <input value={newProduct.colors} onChange={(event) => setNewProduct({ ...newProduct, colors: event.target.value })} placeholder="สี เช่น Black, White" />
+                <input value={newProduct.sizes} onChange={(event) => setNewProduct({ ...newProduct, sizes: event.target.value })} placeholder="ไซซ์:สต๊อก เช่น S:5, M:10" />
+                <button>เพิ่มสินค้า</button>
+              </form>
               <div className="table">
                 {products.map((product) => <div className="table-row" key={product.id}>
-                  <strong>{product.name}<small>{product.category}</small></strong>
+                  <strong><img src={product.image} alt={product.name} />{product.name}<small>{product.category}</small></strong>
                   <input type="number" value={product.price} onChange={(event) => updateProductPrice(product.id, event.target.value)} />
+                  <label className="image-field">รูป<input value={product.image} onChange={(event) => updateProductImage(product.id, event.target.value)} /></label>
                   {Object.keys(product.stockBySize).map((size) => <label key={size}>{size}<input type="number" value={product.stockBySize[size] || 0} onChange={(event) => updateProductStock(product.id, size, event.target.value)} /></label>)}
                 </div>)}
               </div>

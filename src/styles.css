@@ -868,18 +868,65 @@ textarea {
   gap: 10px;
 }
 
+.admin-product-form {
+  border-bottom: 1px solid #e5e0d8;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+}
+
+.admin-product-form input,
+.admin-product-form select {
+  border: 1px solid #dedbd4;
+  min-height: 42px;
+  padding: 10px;
+}
+
+.admin-product-form button {
+  grid-column: 1 / -1;
+}
+
 .table-row {
   align-items: end;
   border-bottom: 1px solid #eee6dc;
   display: grid;
   gap: 8px;
-  grid-template-columns: minmax(220px, 1fr) 110px repeat(auto-fit, minmax(64px, 74px));
+  grid-template-columns: minmax(220px, 1fr) 90px minmax(180px, 1.1fr) repeat(auto-fit, minmax(64px, 74px));
   padding-bottom: 10px;
+}
+
+.table-row strong {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 52px 1fr;
+}
+
+.table-row strong small {
+  grid-column: 2;
+}
+
+.table-row strong img {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  grid-row: 1 / span 2;
+  object-fit: cover;
+  width: 52px;
 }
 
 .table-row label {
   color: #6e665d;
   font-size: 12px;
+}
+
+.table-row .image-field {
+  min-width: 0;
+}
+
+.image-field input {
+  width: 100%;
 }
 
 .order-card {
@@ -915,6 +962,10 @@ textarea {
 
   .table-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-product-form {
+    grid-template-columns: 1fr;
   }
 }
 
