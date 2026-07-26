@@ -431,11 +431,20 @@ export default function App() {
         </label>
         <div className="header-icons">
           {member ? (
-            <button className="header-member" onClick={logoutMember} title="ออกจากระบบ">
-              <UserRound size={22} />
-              <span>{member.name}</span>
-              <LogOut size={18} />
-            </button>
+            <div className="member-actions">
+              <button className="header-member" onClick={() => member.role === 'admin' && setView('admin')} title={member.role === 'admin' ? 'Dashboard' : member.name}>
+                <UserRound size={22} />
+                <span>{member.name}</span>
+              </button>
+              {member.role === 'admin' && (
+                <button className="icon-button admin-shortcut" onClick={() => setView('admin')} title="Dashboard">
+                  <BarChart3 size={22} />
+                </button>
+              )}
+              <button className="icon-button" onClick={logoutMember} title="ออกจากระบบ">
+                <LogOut size={20} />
+              </button>
+            </div>
           ) : (
             <button className="icon-button" onClick={() => openAuth('login')} title={t.accountTitle}>
               <UserRound size={24} />

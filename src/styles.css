@@ -115,6 +115,12 @@ main {
   justify-content: end;
 }
 
+.member-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
 .icon-button,
 .language-pill,
 .header-member {
