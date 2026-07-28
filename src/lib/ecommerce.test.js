@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addCartItem, applyOrderToInventory, buildAdminProduct, buildLineCustomer, calculateCartTotals, createOrder } from './ecommerce';
+import { addCartItem, applyOrderToInventory, buildAdminProduct, buildLineCustomer, calculateCartTotals, createOrder, getProductVariant, normalizeProductVariants } from './ecommerce';
 
 const products = [
   {
@@ -104,6 +104,54 @@ describe('ecommerce helpers', () => {
     });
 
     expect(result[0].quantity).toBe(2);
+  });
+
+  it('keeps one image and separate stock for every color', () => {
+    const variants = normalizeProductVariants({
+      image: 'https://example.com/black.jpg',
+      colors: ['Black', 'White'],
+      stockBySize: { S: 4, M: 2 }
+    });
+
+    expect(variants).toEqual([
+      { id: 'black-0', color: 'Black', images: ['https://example.com/black.jpg'], stockBySize: { S: 4, M: 2 } },
+      { id: 'white-1', color: 'White', images: ['https://example.com/black.jpg'], stockBySize: { S: 4, M: 2 } }
+    ]);
+  });
+
+  it('uses selected color stock when adding to cart', () => {
+    const product = {
+      ...products[0],
+      variants: [
+        { id: 'black', color: 'Black', images: ['black.jpg'], stockBySize: { S: 1 } },
+        { id: 'white', color: 'White', images: ['white.jpg'], stockBySize: { S: 5 } }
+      ]
+    };
+
+    expect(addCartItem({ cartItems: [], product, selectedColor: 'White', selectedSize: 'S', quantity: 4 })).toEqual([
+      { productId: 'linen-shirt', color: 'White', size: 'S', quantity: 4 }
+    ]);
+  });
+
+  it('deducts inventory from the selected color variant', () => {
+    const product = {
+      ...products[0],
+      variants: [
+        { id: 'black', color: 'Black', images: ['black.jpg'], stockBySize: { S: 2 } },
+        { id: 'white', color: 'White', images: ['white.jpg'], stockBySize: { S: 5 } }
+      ]
+    };
+    const order = createOrder({
+      cartItems: [{ productId: 'linen-shirt', color: 'White', size: 'S', quantity: 2 }],
+      products: [product],
+      customer: { name: 'Mali', email: 'mali@example.com' },
+      paymentMethod: 'qr',
+      shippingAddress: 'Bangkok'
+    });
+
+    const updated = applyOrderToInventory([product], order)[0];
+    expect(getProductVariant(updated, 'Black').stockBySize.S).toBe(2);
+    expect(getProductVariant(updated, 'White').stockBySize.S).toBe(3);
   });
 
   it('builds a checkout customer from LINE contact details', () => {

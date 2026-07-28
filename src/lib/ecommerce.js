@@ -20,10 +20,45 @@ export function calculateCartTotals(items, products) {
   };
 }
 
+function makeVariantId(color, index) {
+  return `${String(color || 'Default').toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'default'}-${index}`;
+}
+
+export function normalizeProductVariants(product) {
+  if (Array.isArray(product.variants) && product.variants.length > 0) {
+    return product.variants;
+  }
+
+  const colors = product.colors?.length ? product.colors : ['Default'];
+  return colors.map((color, index) => ({
+    id: makeVariantId(color, index),
+    color,
+    images: [product.image].filter(Boolean),
+    stockBySize: { ...(product.stockBySize || {}) }
+  }));
+}
+
+export function getProductVariant(product, color) {
+  const variants = normalizeProductVariants(product);
+  return variants.find((variant) => variant.color === color) || variants[0];
+}
+
+function withVariantData(product) {
+  const variants = normalizeProductVariants(product);
+  return {
+    ...product,
+    variants,
+    colors: variants.map((variant) => variant.color),
+    image: variants[0]?.images?.[0] || product.image,
+    stockBySize: variants[0]?.stockBySize || product.stockBySize || {}
+  };
+}
+
 export function addCartItem({ cartItems, product, selectedColor, selectedSize, quantity }) {
   const requestedQuantity = Math.max(1, Number(quantity) || 1);
-  const available = product.stockBySize[selectedSize] || 0;
   const color = selectedColor || product.colors?.[0] || 'Default';
+  const variant = getProductVariant(product, color);
+  const available = variant?.stockBySize?.[selectedSize] || 0;
   const existing = cartItems.find(
     (item) => item.productId === product.id && item.color === color && item.size === selectedSize
   );
@@ -64,7 +99,8 @@ export function createOrder({ cartItems, products, customer, paymentMethod, ship
     if (!product) {
       throw new Error('ไม่พบสินค้าในตะกร้า');
     }
-    const available = product.stockBySize[item.size] || 0;
+    const variant = getProductVariant(product, item.color);
+    const available = variant?.stockBySize?.[item.size] || 0;
     if (item.quantity > available) {
       throw new Error(`สินค้า ${product.name} ไซซ์ ${item.size} มีสต๊อกไม่พอ`);
     }
@@ -76,7 +112,7 @@ export function createOrder({ cartItems, products, customer, paymentMethod, ship
       size: item.size,
       quantity: item.quantity,
       unitPrice: product.price,
-      image: product.image
+      image: variant?.images?.[0] || product.image
     };
   });
 
@@ -147,6 +183,14 @@ export function buildAdminProduct({ name, category = 'สินค้าอื�
     .replace(/[^a-z0-9ก-๙]+/gi, '-')
     .replace(/^-+|-+$/g, '') || 'product';
 
+  const colorList = colors?.split(',').map((color) => color.trim()).filter(Boolean) || ['Default'];
+  const variants = colorList.map((color, index) => ({
+    id: makeVariantId(color, index),
+    color,
+    images: [cleanImage],
+    stockBySize: Object.fromEntries(Object.entries(stockBySize).map(([size, quantity]) => [size, index === 0 ? quantity : 0]))
+  }));
+
   return {
     id: `custom-${slug}-${Date.now()}`,
     name: cleanName,
@@ -154,8 +198,9 @@ export function buildAdminProduct({ name, category = 'สินค้าอื�
     brand: 'Nate Store',
     price: Math.max(0, Number(price) || 0),
     image: cleanImage,
-    colors: colors?.split(',').map((color) => color.trim()).filter(Boolean) || ['Default'],
-    stockBySize,
+    colors: colorList,
+    stockBySize: variants[0].stockBySize,
+    variants,
     tags: [cleanName, category],
     perks: [],
     description: cleanName,
@@ -169,11 +214,16 @@ export function applyOrderToInventory(products, order) {
     const orderedItems = order.items.filter((item) => item.productId === product.id);
     if (orderedItems.length === 0) return product;
 
-    const stockBySize = { ...product.stockBySize };
-    orderedItems.forEach((item) => {
-      stockBySize[item.size] = Math.max(0, (stockBySize[item.size] || 0) - item.quantity);
+    const variants = normalizeProductVariants(product).map((variant) => {
+      const variantItems = orderedItems.filter((item) => item.color === variant.color);
+      if (variantItems.length === 0) return variant;
+      const stockBySize = { ...variant.stockBySize };
+      variantItems.forEach((item) => {
+        stockBySize[item.size] = Math.max(0, (stockBySize[item.size] || 0) - item.quantity);
+      });
+      return { ...variant, stockBySize };
     });
-    return { ...product, stockBySize };
+    return withVariantData({ ...product, variants });
   });
 }
 

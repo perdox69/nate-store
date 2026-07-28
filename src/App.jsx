@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BarChart3, Boxes, CreditCard, Heart, LogOut, Minus, Package, Plus, Search, ShoppingBag, UserRound, X } from 'lucide-react';
+import { BarChart3, Boxes, CreditCard, LogOut, Minus, Package, Plus, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import { categories, popularSearches, priceRanges, products as seedProducts } from './data/catalog';
 import { filterProducts } from './lib/catalog';
-import { addCartItem, applyOrderToInventory, buildAdminProduct, buildLineCustomer, calculateCartTotals, createOrder, formatBaht, paymentLabels } from './lib/ecommerce';
+import { addCartItem, applyOrderToInventory, buildAdminProduct, buildLineCustomer, calculateCartTotals, createOrder, formatBaht, getProductVariant, normalizeProductVariants, paymentLabels } from './lib/ecommerce';
 import { createMemberAccount, loginMemberAccount } from './lib/auth';
 import { loadState, saveState } from './lib/store';
 
@@ -184,12 +184,43 @@ function loadProducts() {
       : seedProduct;
   });
   const customProducts = storedProducts.filter((product) => product.customProduct);
-  return [...syncedProducts, ...customProducts];
+  return [...syncedProducts, ...customProducts].map((product) => {
+    const seedProduct = seedProducts.find((entry) => entry.id === product.id);
+    const needsLegacyMigration = Boolean(seedProduct && !product.customProduct && !product.variantsMigrated);
+    const migrationSource = needsLegacyMigration
+      ? {
+          ...product,
+          variants: undefined,
+          colors: product.colors?.length ? product.colors : seedProduct.colors,
+          image: product.customImage ? product.image : seedProduct.image,
+          stockBySize: seedProduct.stockBySize
+        }
+      : product;
+    const variants = normalizeProductVariants(migrationSource);
+    return {
+      ...migrationSource,
+      variants,
+      colors: variants.map((variant) => variant.color),
+      image: variants[0]?.images?.[0] || migrationSource.image,
+      stockBySize: variants[0]?.stockBySize || migrationSource.stockBySize || {},
+      ...(seedProduct ? { variantsMigrated: true } : {})
+    };
+  });
 }
 
 function loadList(key) {
   const storedList = loadState(key, []);
   return Array.isArray(storedList) ? storedList : [];
+}
+
+function withUpdatedVariants(product, variants) {
+  return {
+    ...product,
+    variants,
+    colors: variants.map((variant) => variant.color),
+    image: variants[0]?.images?.[0] || product.image,
+    stockBySize: variants[0]?.stockBySize || {}
+  };
 }
 
 export default function App() {
@@ -220,6 +251,7 @@ export default function App() {
     colors: 'Black, White',
     sizes: 'OS:10'
   });
+  const [adminVariantSelection, setAdminVariantSelection] = useState({});
   const [checkout, setCheckout] = useState({ customerName: '', customerContact: '', address: '', paymentMethod: 'qr' });
 
   useEffect(() => saveState(PRODUCT_STORAGE_KEY, products), [products]);
@@ -234,24 +266,27 @@ export default function App() {
   }, [category, priceRange, products, query]);
 
   const active = products.find((product) => product.id === activeProduct) || products[0] || seedProducts[0];
-  const activeSizes = Object.keys(active.stockBySize);
-  const selectedStock = active.stockBySize[selectedSize] || 0;
+  const activeVariants = normalizeProductVariants(active);
+  const activeVariant = getProductVariant(active, selectedColor);
+  const activeSizes = Object.keys(activeVariant?.stockBySize || {});
+  const selectedStock = activeVariant?.stockBySize?.[selectedSize] || 0;
   const totals = calculateCartTotals(cart, products);
   const t = copy[language];
   const labelCategory = (value) => (language === 'en' ? categoryLabelsEn[value] || value : value);
   const labelPrice = (value) => (language === 'en' ? priceLabelsEn[value] || value : value);
   const labelPayment = (key, value) => (language === 'en' ? paymentLabelsEn[key] || value : value);
   const revenue = orders.reduce((sum, order) => sum + order.totals.total, 0);
-  const lowStock = products.flatMap((product) =>
-    Object.entries(product.stockBySize)
+  const lowStock = products.flatMap((product) => normalizeProductVariants(product).flatMap((variant) =>
+    Object.entries(variant.stockBySize)
       .filter(([, stock]) => stock <= 3)
-      .map(([size, stock]) => `${product.name} ${size}: ${stock}`)
-  );
+      .map(([size, stock]) => `${product.name} ${variant.color} ${size}: ${stock}`)
+  ));
 
   function openProduct(product) {
     setActiveProduct(product.id);
-    setSelectedColor(product.colors[0]);
-    setSelectedSize(Object.keys(product.stockBySize).find((size) => product.stockBySize[size] > 0) || Object.keys(product.stockBySize)[0]);
+    const firstVariant = getProductVariant(product, product.colors?.[0]);
+    setSelectedColor(firstVariant?.color || 'Default');
+    setSelectedSize(Object.keys(firstVariant?.stockBySize || {}).find((size) => firstVariant.stockBySize[size] > 0) || Object.keys(firstVariant?.stockBySize || {})[0]);
     setDetailQuantity(1);
     setView('product');
   }
@@ -280,7 +315,8 @@ export default function App() {
         .map((item) => {
           if (item.productId !== productId || item.size !== size || (item.color || '') !== (color || '')) return item;
           const product = products.find((entry) => entry.id === productId);
-          const nextQuantity = Math.min((product?.stockBySize[size] || 1), item.quantity + delta);
+          const variant = product ? getProductVariant(product, color) : null;
+          const nextQuantity = Math.min((variant?.stockBySize?.[size] || 1), item.quantity + delta);
           return { ...item, quantity: Math.max(0, nextQuantity) };
         })
         .filter((item) => item.quantity > 0)
@@ -384,7 +420,90 @@ export default function App() {
   }
 
   function updateProductImage(productId, value) {
-    setProducts((items) => items.map((product) => (product.id === productId ? { ...product, image: value, customImage: true } : product)));
+    setProducts((items) => items.map((product) => {
+      if (product.id !== productId) return product;
+      const variants = normalizeProductVariants(product).map((variant, index) => index === 0 ? { ...variant, images: [value] } : variant);
+      return { ...withUpdatedVariants(product, variants), customImage: true };
+    }));
+  }
+
+  function updateProductVariant(productId, variantIndex, field, value) {
+    setProducts((items) => items.map((product) => {
+      if (product.id !== productId) return product;
+      const variants = normalizeProductVariants(product).map((variant, index) => {
+        if (index !== variantIndex) return variant;
+        if (field === 'color') return { ...variant, color: value };
+        if (field === 'image') return { ...variant, images: [value] };
+        return variant;
+      });
+      return { ...withUpdatedVariants(product, variants), customImage: true };
+    }));
+  }
+
+  function updateProductVariantStock(productId, variantIndex, size, value) {
+    setProducts((items) => items.map((product) => {
+      if (product.id !== productId) return product;
+      const variants = normalizeProductVariants(product).map((variant, index) => index === variantIndex
+        ? { ...variant, stockBySize: { ...variant.stockBySize, [size]: Math.max(0, Number(value) || 0) } }
+        : variant);
+      return withUpdatedVariants(product, variants);
+    }));
+  }
+
+  function renameProductVariantSize(productId, variantIndex, oldSize, newSize) {
+    const size = newSize.trim();
+    if (!size || size === oldSize) return;
+    setProducts((items) => items.map((product) => {
+      if (product.id !== productId) return product;
+      const variants = normalizeProductVariants(product).map((variant, index) => {
+        if (index !== variantIndex || variant.stockBySize[size] !== undefined) return variant;
+        const stockBySize = { ...variant.stockBySize, [size]: variant.stockBySize[oldSize] };
+        delete stockBySize[oldSize];
+        return { ...variant, stockBySize };
+      });
+      return withUpdatedVariants(product, variants);
+    }));
+  }
+
+  function addProductVariantSize(productId, variantIndex) {
+    setProducts((items) => items.map((product) => {
+      if (product.id !== productId) return product;
+      const variants = normalizeProductVariants(product).map((variant, index) => {
+        if (index !== variantIndex) return variant;
+        const size = `Size ${Object.keys(variant.stockBySize).length + 1}`;
+        return { ...variant, stockBySize: { ...variant.stockBySize, [size]: 0 } };
+      });
+      return withUpdatedVariants(product, variants);
+    }));
+  }
+
+  function addProductVariant(productId) {
+    const product = products.find((entry) => entry.id === productId);
+    const nextIndex = product ? normalizeProductVariants(product).length : 0;
+    setAdminVariantSelection((current) => ({ ...current, [productId]: nextIndex }));
+    setProducts((items) => items.map((product) => {
+      if (product.id !== productId) return product;
+      const variants = normalizeProductVariants(product);
+      const nextNumber = variants.length + 1;
+      return withUpdatedVariants(product, [
+        ...variants,
+        {
+          id: `variant-${Date.now()}`,
+          color: `Color ${nextNumber}`,
+          images: [''],
+          stockBySize: { 'Size 1': 0 }
+        }
+      ]);
+    }));
+  }
+
+  function removeProductVariant(productId, variantIndex) {
+    setAdminVariantSelection((current) => ({ ...current, [productId]: 0 }));
+    setProducts((items) => items.map((product) => {
+      if (product.id !== productId) return product;
+      const variants = normalizeProductVariants(product).filter((_, index) => index !== variantIndex);
+      return variants.length > 0 ? withUpdatedVariants(product, variants) : product;
+    }));
   }
 
   function addAdminProduct(event) {
@@ -450,7 +569,6 @@ export default function App() {
               <UserRound size={24} />
             </button>
           )}
-          <button className="icon-button" title="Wishlist"><Heart size={24} /></button>
           <button className="icon-button bag-button" onClick={() => setView('checkout')} title="ตะกร้าสินค้า">
             <ShoppingBag size={24} />
             {totals.itemCount > 0 && <b>{totals.itemCount}</b>}
@@ -592,9 +710,9 @@ export default function App() {
       {view === 'product' && (
         <section className="product-detail">
           <div className="gallery">
-            <img src={active.image} alt={active.name} />
+            <img src={activeVariant?.images?.[0] || active.image} alt={`${active.name} ${selectedColor}`} />
             <div className="thumb-row">
-              {[active.image, active.image, active.image].map((image, index) => (
+              {[activeVariant?.images?.[0] || active.image].filter(Boolean).map((image, index) => (
                 <button className={index === 0 ? 'selected' : ''} key={index}>
                   <img src={image} alt={`${active.name} ${index + 1}`} />
                 </button>
@@ -621,7 +739,12 @@ export default function App() {
               <strong>{t.color}</strong>
               <div className="swatches">
                 {active.colors.map((color) => (
-                  <button key={color} className={selectedColor === color ? 'selected' : ''} onClick={() => setSelectedColor(color)}>
+                  <button key={color} className={selectedColor === color ? 'selected' : ''} onClick={() => {
+                    const variant = getProductVariant(active, color);
+                    setSelectedColor(color);
+                    setSelectedSize(Object.keys(variant?.stockBySize || {}).find((size) => variant.stockBySize[size] > 0) || Object.keys(variant?.stockBySize || {})[0]);
+                    setDetailQuantity(1);
+                  }}>
                     <span style={{ background: color.toLowerCase() }} />
                     {color}
                   </button>
@@ -632,7 +755,7 @@ export default function App() {
               <strong>{t.size}</strong>
               <div className="sizes">
                 {activeSizes.map((size) => (
-                  <button disabled={(active.stockBySize[size] || 0) === 0} key={size} className={selectedSize === size ? 'selected' : ''} onClick={() => setSelectedSize(size)}>
+                  <button disabled={(activeVariant?.stockBySize?.[size] || 0) === 0} key={size} className={selectedSize === size ? 'selected' : ''} onClick={() => setSelectedSize(size)}>
                     {size}
                   </button>
                 ))}
@@ -743,12 +866,46 @@ export default function App() {
                 <button>เพิ่มสินค้า</button>
               </form>
               <div className="table">
-                {products.map((product) => <div className="table-row" key={product.id}>
-                  <strong><img src={product.image} alt={product.name} />{product.name}<small>{product.category}</small></strong>
-                  <input type="number" value={product.price} onChange={(event) => updateProductPrice(product.id, event.target.value)} />
-                  <label className="image-field">รูป<input value={product.image} onChange={(event) => updateProductImage(product.id, event.target.value)} /></label>
-                  {Object.keys(product.stockBySize).map((size) => <label key={size}>{size}<input type="number" value={product.stockBySize[size] || 0} onChange={(event) => updateProductStock(product.id, size, event.target.value)} /></label>)}
-                </div>)}
+                {products.map((product) => <details className="product-admin-disclosure" key={product.id}>
+                  <summary>
+                    <strong><img src={product.image} alt={product.name} />{product.name}<small>{product.category}</small></strong>
+                    <span>แก้ไขสินค้า</span>
+                  </summary>
+                  <div className="product-admin-body">
+                    <label>ราคา<input type="number" value={product.price} onChange={(event) => updateProductPrice(product.id, event.target.value)} /></label>
+                    <div className="variant-editor-list">
+                      {(() => {
+                        const variants = normalizeProductVariants(product);
+                        const selectedIndex = Math.min(adminVariantSelection[product.id] ?? 0, variants.length - 1);
+                        const variant = variants[selectedIndex];
+                        return <>
+                          <label className="variant-picker">เลือกสี
+                            <select value={selectedIndex} onChange={(event) => setAdminVariantSelection((current) => ({ ...current, [product.id]: Number(event.target.value) }))}>
+                              {variants.map((entry, index) => <option value={index} key={entry.id}>{entry.color}</option>)}
+                            </select>
+                          </label>
+                          <div className="variant-editor" key={variant.id}>
+                            <div className="variant-editor-heading">
+                              <label>ชื่อสี<input value={variant.color} onChange={(event) => updateProductVariant(product.id, selectedIndex, 'color', event.target.value)} /></label>
+                              <button type="button" className="text-button" disabled={variants.length === 1} onClick={() => removeProductVariant(product.id, selectedIndex)}>ลบสี</button>
+                            </div>
+                            <label className="image-field">รูปสีนี้<input value={variant.images?.[0] || ''} onChange={(event) => updateProductVariant(product.id, selectedIndex, 'image', event.target.value)} /></label>
+                            <div className="variant-size-editor">
+                              {Object.entries(variant.stockBySize).map(([size, stock]) => <label key={size}>
+                                ไซซ์
+                                <input defaultValue={size} onBlur={(event) => renameProductVariantSize(product.id, selectedIndex, size, event.target.value)} />
+                                <span>สต๊อก</span>
+                                <input type="number" value={stock} onChange={(event) => updateProductVariantStock(product.id, selectedIndex, size, event.target.value)} />
+                              </label>)}
+                              <button type="button" className="text-button" onClick={() => addProductVariantSize(product.id, selectedIndex)}>+ เพิ่มไซซ์</button>
+                            </div>
+                          </div>
+                        </>;
+                      })()}
+                      <button type="button" className="secondary add-variant-button" onClick={() => addProductVariant(product.id)}>+ เพิ่มสี</button>
+                    </div>
+                  </div>
+                </details>)}
               </div>
             </section>
             <section className="panel">
